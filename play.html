@@ -1,0 +1,255 @@
+<!DOCTYPE html>  
+<html lang="id">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Pemutar Musik Premium</title>  
+    <style>  
+        /* Reset */  
+        * {  
+            margin: 0;  
+            padding: 0;  
+            box-sizing: border-box;  
+            font-family: Arial, sans-serif;  
+        }  
+  
+        /* Body Default (Mode Terang) */  
+        body {  
+            display: flex;  
+            justify-content: center;  
+            align-items: center;  
+            height: 100vh;  
+            flex-direction: column;  
+            padding: 20px;  
+            color: black;  
+            transition: background 0.5s, color 0.5s;  
+            position: relative;  
+        }  
+  
+        /* Background dari URL */  
+        .background {  
+            position: fixed;  
+            top: 0;  
+            left: 0;  
+            width: 100%;  
+            height: 100%;  
+            background-size: cover;  
+            background-position: center;  
+            filter: blur(10px);  
+            z-index: -1;  
+            transition: 0.5s;  
+        }  
+  
+        /* Mode Gelap */  
+        body.dark {  
+            background: #121212;  
+            color: white;  
+        }  
+  
+        /* Tombol Mode Gelap/Terang */  
+        .theme-toggle {  
+            position: absolute;  
+            top: 10px;  
+            right: 10px;  
+            background: none;  
+            border: none;  
+            font-size: 24px;  
+            cursor: pointer;  
+            z-index: 100;  
+            color: black;  
+        }  
+  
+        body.dark .theme-toggle {  
+            color: white;  
+        }  
+  
+        /* Kata Sambutan */  
+        .welcome-box {  
+            background: rgba(255, 255, 255, 0.6);  
+            color: black;  
+            padding: 15px 20px;  
+            border-radius: 10px;  
+            text-align: center;  
+            font-size: 18px;  
+            font-weight: bold;  
+            margin-bottom: 15px;  
+            max-width: 400px;  
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);  
+        }  
+  
+        body.dark .welcome-box {  
+            background: rgba(0, 0, 0, 0.6);  
+            color: white;  
+        }  
+  
+        /* Container Pemutar */  
+        .player-container {  
+            position: relative;  
+            width: 90%;  
+            max-width: 400px;  
+            padding: 20px;  
+            border-radius: 15px;  
+            backdrop-filter: blur(15px);  
+            transition: 0.3s;  
+            text-align: center;  
+            background: rgba(255, 255, 255, 0.7);  
+        }  
+  
+        body.dark .player-container {  
+            background: rgba(0, 0, 0, 0.7);  
+        }  
+  
+        /* Tombol Daftar Lagu */  
+        .song-toggle {  
+            position: absolute;  
+            top: 10px;  
+            right: 10px;  
+            background: none;  
+            border: none;  
+            font-size: 20px;  
+            cursor: pointer;  
+            color: black;  
+        }  
+  
+        body.dark .song-toggle {  
+            color: white;  
+        }  
+  
+        /* Daftar Lagu */  
+        .song-list {  
+            display: none;  
+            list-style: none;  
+            padding: 10px;  
+            margin-top: 10px;  
+            background: rgba(255, 255, 255, 0.8);  
+            border-radius: 10px;  
+            max-height: 150px;  
+            overflow-y: auto;  
+            text-align: left;  
+        }  
+
+        body.dark .song-list {  
+            background: rgba(0, 0, 0, 0.8);  
+        }  
+
+        .song-list li {  
+            padding: 8px;  
+            cursor: pointer;  
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);  
+        }  
+
+        .song-list li:hover {  
+            background: rgba(0, 0, 0, 0.1);  
+        }  
+
+        /* Pemutar Audio */  
+        audio {  
+            width: 100%;  
+            margin-top: 10px;  
+        }  
+
+        /* Info Box */  
+        .info-box {  
+            width: 90%;  
+            max-width: 500px;  
+            background: rgba(255, 255, 255, 0.6);  
+            color: black;  
+            padding: 15px;  
+            border-radius: 10px;  
+            text-align: center;  
+            margin-top: 20px;  
+            font-size: 14px;  
+        }  
+  
+        body.dark .info-box {  
+            background: rgba(0, 0, 0, 0.6);  
+            color: white;  
+        }  
+
+        .info-box .report {  
+            font-weight: bold;  
+        }  
+
+    </style>  
+</head>  
+<body>  
+      
+    <div class="background" id="background"></div>  
+
+    <button class="theme-toggle">☾</button>  
+
+    <div class="welcome-box">  
+        Selamat Datang di Pemutar Musik Premium!  
+        Nikmati pengalaman mendengarkan lagu favorit Anda.  
+    </div>  
+
+    <div class="player-container">  
+        <button class="song-toggle">〠</button>  
+
+        <h2 id="title">Judul Lagu</h2>  
+
+        <audio id="audio" controls></audio>  
+
+        <ul class="song-list" id="songList"></ul>
+
+    </div>  
+
+    <div class="info-box">  
+        <p>🎵 <strong>Tentang Website</strong></p>  
+        <p>Website ini adalah pemutar musik premium dengan tampilan elegan dan fitur mode gelap.</p>  
+        <p>Laporkan masalah atau request lagu baru melalui nomor di bawah ini.</p>  
+        <p class="report">📞 Laporan & Request: <strong>62895323195263</strong></p>  
+    </div>  
+
+    <script>  
+        const backgroundUrl = "https://files.catbox.moe/c5ubxn.jpg";  
+        document.getElementById("background").style.backgroundImage = `url('${backgroundUrl}')`;  
+
+        const songs = [  
+            { title: "PastLives", url: "https://files.catbox.moe/t3fqam.mp3" },  
+            { title: "Runaway", url: "https://files.catbox.moe/48jji0.mp3" },  
+            { title: "Play ( alan walker )", url: "https://files.catbox.moe/k79gu6.mp3" },
+            { title: "Lily", url: "https://files.catbox.moe/4092ev.mp3" },
+            { title: "No Internet", url: "https" },
+            { title: "No Internet", url: "https" },
+            { title: "No Internet", url: "https" },
+            { title: "No Internet", url: "https" },
+        ];  
+
+        let currentIndex = 0;  
+        const audio = document.getElementById("audio");  
+        const title = document.getElementById("title");  
+        const themeToggle = document.querySelector(".theme-toggle");  
+        const songToggle = document.querySelector(".song-toggle");
+        const songList = document.getElementById("songList");
+
+        function loadSong(index) {  
+            currentIndex = index;  
+            title.textContent = songs[index].title;  
+            audio.src = songs[index].url;  
+        }  
+
+        themeToggle.addEventListener("click", () => {  
+            document.body.classList.toggle("dark");  
+            themeToggle.textContent = document.body.classList.contains("dark") ? "☯" : "☯";  
+        });
+
+        songToggle.addEventListener("click", () => {
+            songList.style.display = songList.style.display === "none" ? "block" : "none";
+        });
+
+        songs.forEach((song, index) => {
+            const li = document.createElement("li");
+            li.textContent = song.title;
+            li.addEventListener("click", () => {
+                loadSong(index);
+                audio.play();
+                songList.style.display = "none";  
+            });
+            songList.appendChild(li);
+        });
+
+        loadSong(currentIndex);
+    </script>  
+</body>  
+</html>
